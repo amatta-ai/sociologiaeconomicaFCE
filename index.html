@@ -726,8 +726,28 @@ async function sendMessage(override) {
       })
     });
 
-    const data = await res.json();
+    const text = await res.text();
+    console.log('Respuesta cruda:', text);
     removeTyping();
+
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch(e) {
+      addMessage('agent', 'Error al procesar la respuesta. Detalle: ' + text.substring(0, 200));
+      isLoading = false;
+      document.getElementById('sendBtn').disabled = false;
+      return;
+    }
+
+    console.log('Data parseada:', JSON.stringify(data).substring(0, 300));
+
+    if (data.error) {
+      addMessage('agent', 'Error de API: ' + (data.error.message || JSON.stringify(data.error)));
+      isLoading = false;
+      document.getElementById('sendBtn').disabled = false;
+      return;
+    }
 
     const reply = data.content?.[0]?.text
       || 'No pude procesar tu consulta. Por favor intentá de nuevo.';
@@ -737,7 +757,7 @@ async function sendMessage(override) {
 
   } catch (err) {
     removeTyping();
-    addMessage('agent', 'Hubo un error de conexión. Verificá tu conexión e intentá de nuevo.');
+    addMessage('agent', 'Error de conexión: ' + err.message);
     console.error(err);
   }
 

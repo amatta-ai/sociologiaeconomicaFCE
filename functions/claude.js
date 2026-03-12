@@ -1,8 +1,7 @@
-exports.handler = async function (event) {
+exports.handler = async function(event) {
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: 'Method Not Allowed' };
   }
-
   try {
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -13,15 +12,12 @@ exports.handler = async function (event) {
       },
       body: event.body
     });
-
     const data = await response.json();
-
     return {
       statusCode: 200,
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data)
     };
-
   } catch (err) {
     return {
       statusCode: 500,
@@ -29,16 +25,3 @@ exports.handler = async function (event) {
     };
   }
 };
-```
-
-4. Clic en **"Commit changes"**
-
----
-
-Tu repositorio debería quedar así:
-```
-agente-monografia-se/
-├── index.html
-├── netlify.toml
-└── functions/
-    └── claude.js
